@@ -14,25 +14,30 @@ db.serialize(() => {
     db.run(sql);
 });
 
-// Articles API
-class Articles {
+// Skeys API
+class Skeys {
+    static fix = 0
+    static oldFix = 0
     // 获取所有key
     static all(cb) {
-    	// 使用sqlite3的all
+        Skeys.fix--
+        Skeys.oldFix = Skeys.fix
+        // 使用sqlite3的all
         db.all('SELECT * FROM sKeys', cb);
     }
     // 根据id 获取key
     static find(id, cb) {
-    	// 使用sqlite3的get
-        db.get('SELECT * FROM sKeys WHERE id = ?', id,cb);
+        // 使用sqlite3的get
+        db.get('SELECT * FROM sKeys WHERE id = ?', id, cb);
     }
     // 根据model 获取key
     static findByModel(model, cb) {
-    	// 使用sqlite3的get
-        db.get('SELECT * FROM sKeys WHERE model = ?', model,cb);
+        // 使用sqlite3的get
+        db.get('SELECT * FROM sKeys WHERE model = ?', model, cb);
     }
     // 添加一个条key记录
     static create(data, cb) {
+        Skeys.fix++
         const sql = `
                 INSERT INTO 
                 sKeys(title,content) 
@@ -42,11 +47,13 @@ class Articles {
     }
     // 删除一篇key
     static delete(id, cb) {
+        Skeys.fix++
         if (!id) return cb(new Error(`缺少参数id`));
         db.run('DELETE FROM sKeys WHERE id=?', id, cb)
     }
     // 更新一篇key数据
     static update(data, cb) {
+        Skeys.fix++
         const sql = `
             UPDATE sKeys
             SET title=?,content=?
@@ -55,4 +62,4 @@ class Articles {
         db.run(sql, data.title, data.content, data.id, cb)
     }
 }
-module.exports.Articles = Articles;
+module.exports.Skeys = Skeys;
